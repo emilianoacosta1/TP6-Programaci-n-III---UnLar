@@ -56,5 +56,42 @@ public class MainPractica {
         System.out.println("\n--- Orden por Edad (Ascendente / Method Reference) ---");
         lista.sort(porEdadAsc);
         lista.forEach(System.out::println);
+
+
+        // =========================================================
+        // PARTE 3 - EJERCICIO 5: Criterios compuestos y orden inverso
+        // =========================================================
+
+        // 1. Desempate con thenComparing(): promedio descendente, luego nombre ascendente
+        Comparator<Estudiante> porPromedioDescYNombre = Comparator
+                .comparing(Estudiante::getPromedio)
+                .reversed()
+                .thenComparing(Estudiante::getNombre);
+
+        // 2. Orden inverso con reversed(): a partir del descendente, generamos el ascendente
+        Comparator<Estudiante> porPromedioDesc = Comparator.comparing(Estudiante::getPromedio).reversed();
+        Comparator<Estudiante> porPromedioAsc = porPromedioDesc.reversed();
+
+        // 3. Combiná todo: cantidadMateriasAprobadas descendente, luego nombre ascendente
+        Comparator<Estudiante> porMateriasDescYNombre = Comparator
+                .comparing(Estudiante::getCantidadMateriasAprobadas)
+                .reversed()
+                .thenComparing(Estudiante::getNombre);
+
+        // --- Verificación (Criterio de aceptación) ---
+        
+        System.out.println("\n--- 1. Orden Compuesto: Promedio DESC, desempata Nombre ASC ---");
+        lista.sort(porPromedioDescYNombre);
+        lista.forEach(System.out::println);
+        // Desempate visual: Camila Torres y Lucas González tienen 9.1. Camila debe ir primero.
+
+        System.out.println("\n--- 2. Orden Inverso: Promedio ASC (generado con .reversed()) ---");
+        lista.sort(porPromedioAsc);
+        lista.forEach(System.out::println);
+
+        System.out.println("\n--- 3. Combinado: Materias DESC, desempata Nombre ASC ---");
+        lista.sort(porMateriasDescYNombre);
+        lista.forEach(System.out::println);
+        // Desempate visual: Camila Torres y Lucas González tienen 24 materias. Camila debe ir primero.
     }
 }
