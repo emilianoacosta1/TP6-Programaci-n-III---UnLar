@@ -24,3 +24,13 @@ Las consecuencias de hacerlo serían críticas a nivel de diseño y mantenimient
 * **Violación del Principio Abierto/Cerrado (OCP):** Este principio dicta que las entidades de software deben estar abiertas a la extensión, pero cerradas a la modificación. Si estamos atados a `Comparable` (que permite un solo orden natural) y se requiere un quinto criterio, estamos obligados a "abrir" el código fuente de `Estudiante.java` para alterarlo. 
 
 La solución de diseño para mantener la cohesión alta y el acoplamiento bajo es externalizar este comportamiento mediante la interfaz `Comparator`. Al separar las lógicas de comparación, podemos crear infinitos criterios sin necesidad de tocar ni recompilar la clase original.
+
+**Pregunta 4: Explicá con tus palabras qué es un overflow de enteros, por qué el "truco de la resta" lo provoca, qué parte del contrato de `Comparator` rompe, y por qué `Integer.compare()` no sufre este problema.**
+
+**Respuesta 4:** Un *overflow* (o desbordamiento) de enteros ocurre cuando el resultado de una operación matemática supera el límite máximo o mínimo de memoria que el tipo de dato `int` puede almacenar. 
+
+El "truco de la resta" (`e1.getEdad() - e2.getEdad()`) provoca este problema porque es una operación aritmética ciega a los límites. Como pudimos comprobar, si a un número positivo muy grande le restamos un número negativo (por ejemplo, `Integer.MAX_VALUE - (-1)`), el resultado sobrepasa el límite positivo y "da la vuelta" hacia el extremo negativo, dando un resultado de `-2147483648`.
+
+Al devolver este valor negativo, se rompe directamente la **transitividad, simetría y consistencia** del contrato que exige la interfaz `Comparator`. Básicamente, le estamos dando información falsa a Java, indicándole que el número positivo máximo es "menor" que `-1`.
+
+La forma correcta, que es utilizar `Integer.compare()`, no sufre de este desbordamiento porque **no realiza restas matemáticas**. En su lugar, evalúa directamente los valores mediante operadores relacionales lógicos (`<`, `==`, `>`) y retorna `-1`, `0` o `1` de manera segura ante cualquier caso extremo.

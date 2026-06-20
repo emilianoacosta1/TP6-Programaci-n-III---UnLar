@@ -93,5 +93,35 @@ public class MainPractica {
         lista.sort(porMateriasDescYNombre);
         lista.forEach(System.out::println);
         // Desempate visual: Camila Torres y Lucas González tienen 24 materias. Camila debe ir primero.
+
+        // =========================================================
+        // PARTE 3 - EJERCICIO 6: El anti-patrón de la resta
+        // =========================================================
+        System.out.println("\n=== DEMOSTRACIÓN DEL ANTI-PATRÓN DE LA RESTA ===");
+
+        // 1. Creamos los dos estudiantes con las edades extremas para forzar el error
+        Estudiante eMax = new Estudiante("LU-MAX", "Estudiante Viejo", 5.0, Integer.MAX_VALUE, 10);
+        Estudiante eMin = new Estudiante("LU-MIN", "Estudiante Joven", 5.0, -1, 10);
+
+        // 2. Definimos el comparator con el "truco" prohibido y el comparator correcto
+        Comparator<Estudiante> restaTramposa = (e1, e2) -> e1.getEdad() - e2.getEdad();
+        Comparator<Estudiante> comparacionCorrecta = Comparator.comparing(Estudiante::getEdad);
+
+        System.out.println("Edad de " + eMax.getNombre() + ": " + eMax.getEdad());
+        System.out.println("Edad de " + eMin.getNombre() + ": " + eMin.getEdad());
+
+        // 3. Verificamos el error en tiempo de ejecución
+        int resultadoTramposo = restaTramposa.compare(eMax, eMin);
+        System.out.println("\nResultado usando (eMax - eMin): " + resultadoTramposo);
+        if (resultadoTramposo < 0) {
+            System.out.println("Incorrecto: Da negativo debido al overflow. Java cree falsamente que eMax es MENOR que eMin.");
+        }
+
+        // 4. Comprobamos la solución con Integer.compare()
+        int resultadoCorrecto = comparacionCorrecta.compare(eMax, eMin);
+        System.out.println("\nResultado usando Integer.compare(eMax, eMin): " + resultadoCorrecto);
+        if (resultadoCorrecto > 0) {
+            System.out.println("Correcto: Da positivo (1). Java sabe que eMax es estrictamente MAYOR que eMin.");
+        }
     }
 }
