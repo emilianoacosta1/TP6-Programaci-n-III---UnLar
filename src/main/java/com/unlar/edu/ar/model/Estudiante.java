@@ -1,5 +1,6 @@
 package com.unlar.edu.ar.model;
-public class Estudiante {
+
+public class Estudiante implements Comparable<Estudiante> {
 
     private String legajo;
     private String nombre;
@@ -64,5 +65,11 @@ public class Estudiante {
                 ", edad=" + edad +
                 ", materias=" + cantidadMateriasAprobadas +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Estudiante otro) {
+
+        return Double.compare(otro.getPromedio(), this.promedio);
     }
 }
