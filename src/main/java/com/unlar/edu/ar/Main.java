@@ -1,4 +1,4 @@
-package com.unlar.edu.ar.ui;
+package com.unlar.edu.ar;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
