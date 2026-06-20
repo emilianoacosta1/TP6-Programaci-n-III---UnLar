@@ -34,3 +34,13 @@ El "truco de la resta" (`e1.getEdad() - e2.getEdad()`) provoca este problema por
 Al devolver este valor negativo, se rompe directamente la **transitividad, simetría y consistencia** del contrato que exige la interfaz `Comparator`. Básicamente, le estamos dando información falsa a Java, indicándole que el número positivo máximo es "menor" que `-1`.
 
 La forma correcta, que es utilizar `Integer.compare()`, no sufre de este desbordamiento porque **no realiza restas matemáticas**. En su lugar, evalúa directamente los valores mediante operadores relacionales lógicos (`<`, `==`, `>`) y retorna `-1`, `0` o `1` de manera segura ante cualquier caso extremo.
+
+**Pregunta 5: ¿Qué patrón de diseño estás aplicando al usar un `Map<String, Comparator<T>>` en lugar de un `switch`? Explicá cómo se relaciona este patrón con el polimorfismo y por qué es preferible a la alternativa procedural.**
+
+**Respuesta 5:** Al utilizar un `Map` para registrar y recuperar dinámicamente las distintas lógicas de ordenamiento, estamos aplicando el **Patrón de Diseño Strategy (Estrategia)**. 
+
+Este patrón se relaciona íntimamente con el **polimorfismo** porque nos permite tratar a múltiples comportamientos distintos de una manera unificada. En nuestro caso, todos los valores almacenados en el mapa implementan la misma interfaz genérica (`Comparator<T>`). Nuestro método `ordenar` no necesita saber si está comparando números enteros, decimales o cadenas de texto; simplemente extrae la "estrategia" correspondiente según la clave ingresada y le delega el trabajo ejecutando el método de comparación. Gracias al polimorfismo, Java resuelve en tiempo de ejecución cuál es la implementación exacta que debe usar.
+
+Esta solución orientada a objetos es ampliamente preferible a la alternativa procedural (como un `switch` o múltiples `if-else`) porque respeta el **Principio Abierto/Cerrado (Open/Closed Principle)** de SOLID:
+* **Mantenibilidad (Abierto a la extensión, cerrado a la modificación):** Si el día de mañana requerimos agregar un nuevo criterio (por ejemplo, ordenar por "fecha de inscripción"), con un `switch` estaríamos obligados a modificar el código central agregando un nuevo `case`. Con el patrón Strategy, el método `ordenar` queda intacto y cerrado a modificaciones; simplemente "extendemos" la funcionalidad agregando un nuevo par clave-valor al `Map` inicial.
+* **Legibilidad y Cohesión:** Elimina la complejidad ciclomática. El método central se vuelve mucho más limpio y fácil de leer, ya que delega la responsabilidad de selección a la estructura de datos y se enfoca únicamente en aplicar la estrategia obtenida.

@@ -14,7 +14,6 @@ public class EstudianteService {
 
     @PostConstruct
     public void init() {
-        // Inicializamos los 10 estudiantes con los empates intencionales
         estudiantesEnMemoria = new ArrayList<>(Arrays.asList(
                 new Estudiante("LU-2024-001", "Martín Quiroga", 8.5, 22, 18),
                 new Estudiante("LU-2024-002", "Valeria Díaz", 8.5, 20, 15),
@@ -28,7 +27,7 @@ public class EstudianteService {
                 new Estudiante("LU-2024-010", "Lucía Fernández", 7.8, 21, 16)
         ));
 
-        // Armamos el Map con las estrategias de comparación (Esto nos adelanta el Ejercicio 8)
+        // Punto 1: El Map que reemplaza al switch
         estrategiasDeOrdenamiento = new HashMap<>();
         estrategiasDeOrdenamiento.put("promedio", Comparator.comparing(Estudiante::getPromedio));
         estrategiasDeOrdenamiento.put("edad", Comparator.comparing(Estudiante::getEdad));
@@ -37,25 +36,29 @@ public class EstudianteService {
         estrategiasDeOrdenamiento.put("legajo", Comparator.comparing(Estudiante::getLegajo));
     }
 
-    public List<Estudiante> ordenar(String sortBy, String order) {
-        // Validamos que el criterio exista
+    public List<Estudiante> obtenerTodos() {
+        return new ArrayList<>(estudiantesEnMemoria);
+    }
+
+    // Punto 2: Firma exacta pedida en el TP
+    public List<Estudiante> ordenar(List<Estudiante> lista, String sortBy, String order) {
+        
+        // Si no existe el criterio, lanzamos excepción (luego Spring tira error 400 o 500)
         if (!estrategiasDeOrdenamiento.containsKey(sortBy)) {
             throw new IllegalArgumentException("Criterio inválido: " + sortBy);
         }
 
-        // 1. Obtenemos el comparador principal desde el mapa
-        Comparator<Estudiante> comparator = estrategiasDeOrdenamiento.get(sortBy);
+        // Buscamos el comparador y le sumamos el tie-breaker por legajo (del Ejercicio 7)
+        Comparator<Estudiante> comparator = estrategiasDeOrdenamiento.get(sortBy)
+                                                .thenComparing(Estudiante::getLegajo);
 
-        // 2. Aplicamos el tie-breaker (desempate) por defecto que exige el Ejercicio 7
-        comparator = comparator.thenComparing(Estudiante::getLegajo);
-
-        // 3. Verificamos si el cliente pidió orden descendente
+        // Aplicamos reversed si lo piden
         if ("desc".equalsIgnoreCase(order)) {
             comparator = comparator.reversed();
         }
 
-        // 4. Creamos una copia de la lista para no alterar el orden original en memoria
-        List<Estudiante> listaOrdenada = new ArrayList<>(estudiantesEnMemoria);
+        // Ordenamos y devolvemos
+        List<Estudiante> listaOrdenada = new ArrayList<>(lista);
         listaOrdenada.sort(comparator);
 
         return listaOrdenada;

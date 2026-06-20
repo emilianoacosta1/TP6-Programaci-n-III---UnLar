@@ -16,7 +16,6 @@ public class EstudianteController {
 
     private final EstudianteService estudianteService;
 
-    // Inyección de dependencias
     public EstudianteController(EstudianteService estudianteService) {
         this.estudianteService = estudianteService;
     }
@@ -26,7 +25,12 @@ public class EstudianteController {
             @RequestParam(defaultValue = "promedio") String sortBy,
             @RequestParam(defaultValue = "asc") String order) {
         
-        List<Estudiante> listaOrdenada = estudianteService.ordenar(sortBy, order);
+        // 1. Obtenemos la lista original
+        List<Estudiante> listaBase = estudianteService.obtenerTodos();
+        
+        // 2. Usamos el método con la firma estricta que pide el TP
+        List<Estudiante> listaOrdenada = estudianteService.ordenar(listaBase, sortBy, order);
+        
         return ResponseEntity.ok(listaOrdenada);
     }
 }
